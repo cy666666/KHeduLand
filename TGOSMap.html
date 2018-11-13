@@ -1,0 +1,39 @@
+﻿<!DOCTYPE html>
+
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+
+    <title>TGOS MAP API 初始化地圖</title>
+
+    <script type="text/javascript" src="http://api.tgos.tw/TGOS_API/tgos?ver=2&AppID=kOKB4i674QFcKJAYNCljlHTlIUh8VxKCJYeWkYoIVXEOx7xkkUeHxQ==&APIKey=cGEErDNy5yN/1fQ0vyTOZrghjE+jIU6uwTAxJL75pM6HqosSNT+bowHs5QYyV0BiYi2YRUg7GbZbaQZYBZPCrUv4iCn5ybWs99q9up2ncOvicfPTNXrQJxxKJFr9LdxhqxNxAEAGul3Pnn+0pzOKH+oBG+eifCOGQTHyH9hq+N6Ml6+AwZc3ejL56Zksj9uUVZzcxmWpSOlNw46Bf4SBsY0Z+CVTwVbDa13ZvXG6/Xk8XNz3XLZDPmz2A8met15QelpQwkK+OWAx2H8IJjXbIhAyYYyXWdvXXt1Od0VEOAO6krKwkwLxlE+H05plChxmHadisPii+Bysw0Jkpdd7bTvCHkjHyuws" charset="utf-8"></script>
+
+    //設定取得API的位址
+
+    <script type="text/javascript">
+        var pMap;
+        function InitWnd() {
+            var pOMap = document.getElementById("TGMap");
+            pMap = new TGOS.TGOnlineMap(pOMap, TGOS.TGCoordSys.EPSG3826); //宣告TGOnlineMap地圖物件並設定坐標系統
+        }
+        function getDiv() {
+            var mapDiv = pMap.getDiv(); //取得地圖物件的DIV，可取得此物件相關設定屬性
+            //alert(mapDiv); //利用此物件取得DIV寬高
+            alert(mapDiv.style.width.toString() + "\n" + mapDiv.style.height.toString()); //利用此物件取得DIV寬高
+        }
+        function getTransformation() {
+            var pTrans = pMap.getZoom(); //取得目前地圖縮放層級
+            alert("目前層級:" + pTrans);
+        }
+    </script>
+</head>
+<body style="margin: 0px">
+    <div id="TGMap" style="width: 640px; height: 480px; border: 1px solid #C0C0C0;">
+    </div>
+    <br />
+    <input type="button" onclick="InitWnd()" value="開啟地圖" />
+    <input type="button" onclick="getDiv()" value="取得DIV物件" />
+    <input type="button" onclick="getTransformation()" value="取得目前地圖縮放層級" />
+</body>
+</html>

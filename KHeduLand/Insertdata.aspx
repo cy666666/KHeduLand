@@ -14,13 +14,66 @@
                 <asp:TextBox ID="tbx_landname" runat="server" AutoCompleteType="Cellular" ></asp:TextBox>
                 <asp:Label ID="Label1" runat="server" ForeColor="Red"></asp:Label>
             </h4>
-            <p>
-                <asp:Label ID="lb_locationstreet" runat="server" Text="lb_locationstreet"></asp:Label>
-            </p>
+            <h4>
+                <asp:Label ID="lb_locationstreet" runat="server" Text="街道位置 : "></asp:Label>
+                <asp:TextBox ID="tbx_locationstreet" runat="server"></asp:TextBox>
+            </h4>
+            <h4>
+                <asp:Label ID="lb_authority" runat="server" Text="代管單位 : "></asp:Label>
+                <asp:TextBox ID="tbx_authority" runat="server"></asp:TextBox>
+            </h4>
             <h4>
                 <asp:Label ID="lb_area" runat="server" Text="總面積 : "></asp:Label>
                 <asp:TextBox ID="tbx_area" runat="server"></asp:TextBox>
             </h4>
+            <h4>
+                <asp:Label ID="lb_landownership" runat="server" Text="土地權屬 : "></asp:Label>
+                <asp:TextBox ID="tbx_landownership" runat="server"></asp:TextBox>
+            </h4>
+            <h4>
+                <asp:Label ID="lb_landvalue" runat="server" Text="公告現值 : "></asp:Label>
+                <asp:TextBox ID="tbx_landvalue" runat="server"></asp:TextBox>
+            </h4>
+            <h4>
+                <asp:Label ID="lb_neighbor_east" runat="server" Text="鄰近都市計畫使用分區（東） : "></asp:Label>
+                <asp:TextBox ID="tbx_neighbor_east" runat="server"></asp:TextBox>
+            </h4>  
+            <h4>
+                <asp:Label ID="lb_neighbor_south" runat="server" Text="鄰近都市計畫使用分區（南） : "></asp:Label>
+                <asp:TextBox ID="tbx_neighbor_south" runat="server"></asp:TextBox>
+            </h4>
+            <h4>
+                <asp:Label ID="lb_neighbor_west" runat="server" Text="鄰近都市計畫使用分區（西） : "></asp:Label>
+                <asp:TextBox ID="tbx_neighbor_west" runat="server"></asp:TextBox>
+            </h4>      
+            <h4>
+                <asp:Label ID="lb_neighbor_north" runat="server" Text="鄰近都市計畫使用分區（北） : "></asp:Label>
+                <asp:TextBox ID="tbx_neighbor_north" runat="server"></asp:TextBox>
+            </h4> 
+            <h4>
+                <asp:Label ID="lb_getway" runat="server" Text="取得方式 : "></asp:Label>
+                <asp:TextBox ID="tbx_getway" runat="server"></asp:TextBox>
+            </h4>       
+            <h4>
+                <asp:Label ID="lb_useperoid" runat="server" Text="徵收計畫使用期程 : "></asp:Label>
+                <asp:TextBox ID="tbx_useperoid" runat="server"></asp:TextBox>
+            </h4>   
+            <h4>
+                <asp:Label ID="lb_situation" runat="server" Text="現況 : "></asp:Label>
+                <asp:TextBox ID="tbx_situation" runat="server" TextMode="MultiLine"></asp:TextBox>
+            </h4>    
+            <h4>
+                <asp:Label ID="lb_review" runat="server" Text="重新檢討及後續處理情形 : "></asp:Label>
+                <asp:TextBox ID="tbx_review" runat="server" TextMode="MultiLine"></asp:TextBox>
+            </h4>  
+            <h4>
+                <asp:Label ID="lb_maintain" runat="server" Text="維護管理措施 : "></asp:Label>
+                <asp:TextBox ID="tbx_maintain" runat="server" TextMode="MultiLine"></asp:TextBox>
+            </h4>        
+            <h4>
+                <asp:Label ID="lb_other" runat="server" Text="其他 : "></asp:Label>
+                <asp:TextBox ID="tbx_other" runat="server" TextMode="MultiLine"></asp:TextBox>
+            </h4>                                 
             <p>
                 &nbsp;</p>
             <p>

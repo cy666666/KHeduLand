@@ -45,11 +45,25 @@ namespace KHeduLand
                     }
                     dr.Close();
                   
-                    sqlStr = "INSERT INTO tb_LAND (land_name,region_id,area) VALUES(@land_name, @region_id, @area); ";
+                    sqlStr = "INSERT INTO tb_LAND (region_id,land_name,location_street,authority,area,land_ownership,land_value,neighbor_east,neighbor_south,neighbor_west,neighbor_north,getway,use_period,situation,review,maintain,other) VALUES(@region_id,@land_name,@location_street,@authority,@area,@land_ownership,@land_value,@neighbor_east,@neighbor_south,@neighbor_west,@neighbor_north,@getway,@use_period,@situation,@review,@maintain,@other); ";
                     cmd = new SqlCommand(sqlStr, conn);
-                    cmd.Parameters.AddWithValue("@land_name", tbx_landname.Text);
-                    cmd.Parameters.AddWithValue("@region_id", ddl_regionid.SelectedValue);
-                    cmd.Parameters.AddWithValue("@area", tbx_area.Text);
+                    cmd.Parameters.Add("@region_id", SqlDbType.Int).Value=ddl_regionid.SelectedValue;
+                    cmd.Parameters.Add("@land_name", SqlDbType.NVarChar).Value=tbx_landname.Text;
+                    cmd.Parameters.Add("@location_street", SqlDbType.NVarChar).Value=tbx_locationstreet.Text;
+                    cmd.Parameters.Add("authority", SqlDbType.NVarChar).Value=tbx_authority.Text;
+                    cmd.Parameters.Add("@area", SqlDbType.Float).Value=tbx_area.Text;
+                    cmd.Parameters.Add("@land_ownership", SqlDbType.NVarChar).Value=tbx_landownership.Text;
+                    cmd.Parameters.AddWithValue("@land_value", tbx_landvalue.Text);
+                    cmd.Parameters.AddWithValue("@neighbor_east", tbx_neighbor_east.Text);
+                    cmd.Parameters.AddWithValue("@neighbor_south", tbx_neighbor_south.Text);
+                    cmd.Parameters.AddWithValue("@neighbor_west", tbx_neighbor_west.Text);
+                    cmd.Parameters.AddWithValue("@neighbor_north", tbx_neighbor_north.Text);
+                    cmd.Parameters.AddWithValue("@getway", tbx_getway.Text);
+                    cmd.Parameters.AddWithValue("@use_period", tbx_useperoid.Text);
+                    cmd.Parameters.AddWithValue("@situation", tbx_situation.Text);
+                    cmd.Parameters.AddWithValue("@review", tbx_review.Text);
+                    cmd.Parameters.AddWithValue("@maintain", tbx_maintain.Text);
+                    cmd.Parameters.AddWithValue("@other", tbx_other.Text);
                     cmd.ExecuteNonQuery();
                     
                     //Response.Write("<Script language='JavaScript'>alert('新增1筆資料:" + ddl_regionid.SelectedItem + " " + tbx_landname.Text + "');</Script>");

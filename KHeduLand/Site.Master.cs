@@ -76,6 +76,11 @@ namespace KHeduLand
         {
             Context.GetOwinContext().Authentication.SignOut(DefaultAuthenticationTypes.ApplicationCookie);
         }
+        protected override void OnLoad(EventArgs e)
+        {
+            base.OnLoad(e);
+            Page.Header.DataBind();
+        }
     }
 
 }
