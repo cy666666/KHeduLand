@@ -27,6 +27,14 @@
                 <asp:TextBox ID="tbx_area" runat="server"></asp:TextBox>
             </h4>
             <h4>
+                <asp:Label ID="lb_coordinate_x" runat="server" Text="座標X(TWD97) : "></asp:Label>
+                <asp:TextBox ID="tbx_coordinate_x" runat="server"></asp:TextBox>
+            </h4>
+            <h4>
+                <asp:Label ID="lb_coordinate_y" runat="server" Text="座標Y(TWD97) : "></asp:Label>
+                <asp:TextBox ID="tbx_coordinate_y" runat="server"></asp:TextBox>
+            </h4>
+            <h4>
                 <asp:Label ID="lb_landownership" runat="server" Text="土地權屬 : "></asp:Label>
                 <asp:TextBox ID="tbx_landownership" runat="server"></asp:TextBox>
             </h4>
@@ -81,7 +89,7 @@
                 <asp:Label ID="lb_insertcheck" runat="server" Text="Label"></asp:Label>
             
             </p>
-                <asp:SqlDataSource ID="SqlDataSource2" runat="server"  ConnectionString="<%$ ConnectionStrings:SQLDB %>" DeleteCommand="DELETE FROM tb_LAND WHERE (land_id = @land_id)" InsertCommand="INSERT INTO tb_LAND(region_id, land_name, location_street, authority, area, land_ownership, land_value, neighbor_east, neighbor_south, neighbor_west, neighbor_north, getway, use_period, situation, review, maintain, other) VALUES (@region_id, @land_name, @location_street, @authority, @area, @land_ownership, @land_value, @neighbor_east, @neighbor_south, @neighbor_west, @neighbor_north, @getway, @use_period, @situation, @review, @maintain, @other)" SelectCommand="SELECT tb_LAND.land_id, tb_REGION.region_name, tb_LAND.land_name, tb_LAND.location_street, tb_LAND.authority, tb_LAND.area, tb_LAND.land_ownership, tb_LAND.land_value, tb_LAND.neighbor_east, tb_LAND.neighbor_south, tb_LAND.neighbor_west, tb_LAND.neighbor_north, tb_LAND.getway, tb_LAND.use_period, tb_LAND.situation, tb_LAND.review, tb_LAND.maintain, tb_LAND.other, tb_LAND.region_id FROM tb_LAND INNER JOIN tb_REGION ON tb_LAND.region_id = tb_REGION.region_id" UpdateCommand="UPDATE tb_LAND SET region_id = @region_id, land_name = @land_name, location_street = @location_street, authority = @authority, area = @area, land_ownership = @land_ownership, land_value = @land_value, neighbor_east = @neighbor_east, neighbor_south = @neighbor_south, neighbor_west = @neighbor_west, neighbor_north = @neighbor_north, getway = @getway, use_period = @use_period, situation = @situation, review = @review, maintain = @maintain, other = @other FROM tb_LAND INNER JOIN tb_REGION ON tb_LAND.region_id = tb_REGION.region_id">
+                <asp:SqlDataSource ID="SqlDataSource2" runat="server"  ConnectionString="<%$ ConnectionStrings:SQLDB %>" DeleteCommand="DELETE FROM tb_LAND WHERE (land_id = @land_id)" InsertCommand="INSERT INTO tb_LAND(region_id, land_name, location_street, authority, area, land_ownership, land_value, neighbor_east, neighbor_south, neighbor_west, neighbor_north, getway, use_period, situation, review, maintain, other, coordinate_x, coordinate_y) VALUES (@region_id, @land_name, @location_street, @authority, @area, @land_ownership, @land_value, @neighbor_east, @neighbor_south, @neighbor_west, @neighbor_north, @getway, @use_period, @situation, @review, @maintain, @other, @coordinate_x, @coordinate_y)" SelectCommand="SELECT tb_LAND.land_id, tb_REGION.region_name, tb_LAND.land_name, tb_LAND.location_street, tb_LAND.authority, tb_LAND.area, tb_LAND.land_ownership, tb_LAND.land_value, tb_LAND.neighbor_east, tb_LAND.neighbor_south, tb_LAND.neighbor_west, tb_LAND.neighbor_north, tb_LAND.getway, tb_LAND.use_period, tb_LAND.situation, tb_LAND.review, tb_LAND.maintain, tb_LAND.other, tb_LAND.region_id, tb_LAND.coordinate_x, tb_LAND.coordinate_y FROM tb_LAND INNER JOIN tb_REGION ON tb_LAND.region_id = tb_REGION.region_id" UpdateCommand="UPDATE tb_LAND SET region_id = @region_id, land_name = @land_name, location_street = @location_street, authority = @authority, area = @area, coordinate_x = @coordinate_x, coordinate_y = @coordinate_y, land_ownership = @land_ownership, land_value = @land_value, neighbor_east = @neighbor_east, neighbor_south = @neighbor_south, neighbor_west = @neighbor_west, neighbor_north = @neighbor_north, getway = @getway, use_period = @use_period, situation = @situation, review = @review, maintain = @maintain, other = @other FROM tb_LAND INNER JOIN tb_REGION ON tb_LAND.region_id = tb_REGION.region_id WHERE (tb_LAND.land_id = @land_id)">
                     <DeleteParameters>
                         <asp:Parameter Name="land_id" />
                     </DeleteParameters>
@@ -90,7 +98,7 @@
                         <asp:Parameter Name="land_name" Type="String"/>
                         <asp:Parameter Name="location_street" Type="String"/>
                         <asp:Parameter Name="authority" Type="String"/>
-                        <asp:Parameter Name="area" Type="Int32"/>
+                        <asp:Parameter Name="area" Type="Double"/>
                         <asp:Parameter Name="land_ownership" Type="String"/>
                         <asp:Parameter Name="land_value" Type="String"/>
                         <asp:Parameter Name="neighbor_east" Type="String"/>
@@ -103,13 +111,17 @@
                         <asp:Parameter Name="review" Type="String"/>
                         <asp:Parameter Name="maintain" Type="String"/>
                         <asp:Parameter Name="other" Type="String"/>
+                        <asp:Parameter Name="coordinate_x" Type="Double"/>
+                        <asp:Parameter Name="coordinate_y" Type="Double"/>
                     </InsertParameters>
                     <UpdateParameters>
                         <asp:Parameter Name="region_id" Type="Int32"/>
                         <asp:Parameter Name="land_name" Type="String"/>
                         <asp:Parameter Name="location_street" Type="String"/>
                         <asp:Parameter Name="authority" Type="String"/>
-                        <asp:Parameter Name="area" Type="Int32"/>
+                        <asp:Parameter Name="area" Type="Double"/>
+                        <asp:Parameter Name="coordinate_x" Type="Double"/>
+                        <asp:Parameter Name="coordinate_y" Type="Double"/>
                         <asp:Parameter Name="land_ownership" Type="String"/>
                         <asp:Parameter Name="land_value" Type="String"/>
                         <asp:Parameter Name="neighbor_east" Type="String"/>
@@ -122,27 +134,47 @@
                         <asp:Parameter Name="review" Type="String"/>
                         <asp:Parameter Name="maintain" Type="String"/>
                         <asp:Parameter Name="other" Type="String"/>
+                        <asp:Parameter Name="land_id" Type="Int32"/>
                     </UpdateParameters>
                 </asp:SqlDataSource>
-            <p>
-                <asp:GridView ID="GridView1" runat="server" DataSourceID="SqlDataSource2">
+                <asp:SqlDataSource ID="SqlDataSource3" runat="server" ConnectionString="<%$ ConnectionStrings:SQLDB %>" SelectCommand="SELECT * FROM [tb_REGION]"></asp:SqlDataSource>
+                <asp:GridView ID="GridView1" runat="server" DataSourceID="SqlDataSource2" AutoGenerateColumns="False" DataKeyNames="land_id" EmptyDataText="Empty">
                     <Columns>
                         <asp:CommandField ShowEditButton="True" />
-                        <asp:TemplateField HeaderText="新增" ShowHeader="False">
+                        <asp:BoundField DataField="land_id" HeaderText="land_id" InsertVisible="False" ReadOnly="True" SortExpression="land_id" />
+                        <asp:TemplateField HeaderText="region_name" SortExpression="region_name">
                             <EditItemTemplate>
-                                <asp:LinkButton ID="LinkButton1" runat="server" CausesValidation="True" CommandName="Update" Text="更新"></asp:LinkButton>
+                                <asp:DropDownList ID="DropDownList1" runat="server" AutoPostBack="True" DataSourceID="SqlDataSource3" DataTextField="region_name" DataValueField="region_id" SelectedValue='<%# Bind("region_id") %>'>
+                                </asp:DropDownList>
                             </EditItemTemplate>
                             <ItemTemplate>
-                                <asp:LinkButton ID="LinkButton1" runat="server" CausesValidation="False" CommandName="Edit" Text="新增"></asp:LinkButton>
+                                <asp:Label ID="Label1" runat="server" Text='<%# Bind("region_name") %>'></asp:Label>
                             </ItemTemplate>
                         </asp:TemplateField>
+                        <asp:BoundField DataField="land_name" HeaderText="land_name" SortExpression="land_name" />
+                        <asp:BoundField DataField="location_street" HeaderText="location_street" SortExpression="location_street" />
+                        <asp:BoundField DataField="authority" HeaderText="authority" SortExpression="authority" />
+                        <asp:BoundField DataField="area" HeaderText="area" SortExpression="area" />
+                        <asp:BoundField DataField="land_ownership" HeaderText="land_ownership" SortExpression="land_ownership" />
+                        <asp:BoundField DataField="land_value" HeaderText="land_value" SortExpression="land_value" />
+                        <asp:BoundField DataField="neighbor_east" HeaderText="neighbor_east" SortExpression="neighbor_east" />
+                        <asp:BoundField DataField="neighbor_south" HeaderText="neighbor_south" SortExpression="neighbor_south" />
+                        <asp:BoundField DataField="neighbor_west" HeaderText="neighbor_west" SortExpression="neighbor_west" />
+                        <asp:BoundField DataField="neighbor_north" HeaderText="neighbor_north" SortExpression="neighbor_north" />
+                        <asp:BoundField DataField="getway" HeaderText="getway" SortExpression="getway" />
+                        <asp:BoundField DataField="use_period" HeaderText="use_period" SortExpression="use_period" />
+                        <asp:BoundField DataField="situation" HeaderText="situation" SortExpression="situation" />
+                        <asp:BoundField DataField="review" HeaderText="review" SortExpression="review" />
+                        <asp:BoundField DataField="maintain" HeaderText="maintain" SortExpression="maintain" />
+                        <asp:BoundField DataField="other" HeaderText="other" SortExpression="other" />
+                        <asp:BoundField DataField="coordinate_x" HeaderText="coordinate_x" SortExpression="coordinate_x" />
+                        <asp:BoundField DataField="coordinate_y" HeaderText="coordinate_y" SortExpression="coordinate_y" />
                     </Columns>
                     <EmptyDataTemplate>
                         <asp:DetailsView ID="DetailsView1" runat="server" DataSourceID="SqlDataSource2" DefaultMode="Insert" Height="50px" Width="125px">
                         </asp:DetailsView>
                     </EmptyDataTemplate>
                 </asp:GridView>
-            </p>
             <br />
                 <br />
             </asp:Content>

@@ -16,7 +16,7 @@ namespace KHeduLand
         {
             if (!Page.IsPostBack)
             {
-               
+                GridView1.DataBind();
             }
         }
         
@@ -45,13 +45,15 @@ namespace KHeduLand
                     }
                     dr.Close();
                   
-                    sqlStr = "INSERT INTO tb_LAND (region_id,land_name,location_street,authority,area,land_ownership,land_value,neighbor_east,neighbor_south,neighbor_west,neighbor_north,getway,use_period,situation,review,maintain,other) VALUES(@region_id,@land_name,@location_street,@authority,@area,@land_ownership,@land_value,@neighbor_east,@neighbor_south,@neighbor_west,@neighbor_north,@getway,@use_period,@situation,@review,@maintain,@other); ";
+                    sqlStr = "INSERT INTO tb_LAND (region_id,land_name,location_street,authority,area,coordinate_x,coordinate_y,land_ownership,land_value,neighbor_east,neighbor_south,neighbor_west,neighbor_north,getway,use_period,situation,review,maintain,other) VALUES(@region_id,@land_name,@location_street,@authority,@area,@coordinate_x,@coordinate_y,@land_ownership,@land_value,@neighbor_east,@neighbor_south,@neighbor_west,@neighbor_north,@getway,@use_period,@situation,@review,@maintain,@other); ";
                     cmd = new SqlCommand(sqlStr, conn);
                     cmd.Parameters.Add("@region_id", SqlDbType.Int).Value=ddl_regionid.SelectedValue;
                     cmd.Parameters.Add("@land_name", SqlDbType.NVarChar).Value=tbx_landname.Text;
                     cmd.Parameters.Add("@location_street", SqlDbType.NVarChar).Value=tbx_locationstreet.Text;
                     cmd.Parameters.Add("authority", SqlDbType.NVarChar).Value=tbx_authority.Text;
                     cmd.Parameters.Add("@area", SqlDbType.Float).Value=tbx_area.Text;
+                    cmd.Parameters.Add("@coordinate_x", SqlDbType.Float).Value = tbx_coordinate_x.Text;
+                    cmd.Parameters.Add("@coordinate_y", SqlDbType.Float).Value = tbx_coordinate_y.Text;
                     cmd.Parameters.Add("@land_ownership", SqlDbType.NVarChar).Value=tbx_landownership.Text;
                     cmd.Parameters.AddWithValue("@land_value", tbx_landvalue.Text);
                     cmd.Parameters.AddWithValue("@neighbor_east", tbx_neighbor_east.Text);
@@ -76,6 +78,7 @@ namespace KHeduLand
                 Response.Write(ex.ToString());
             }                    
         }
-        
+
+
     }
 }
