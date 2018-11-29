@@ -40,7 +40,14 @@
         
      <div id="tgosdv" runat="server">
      <script type="text/javascript" >
-        var pMap=null;
+         var pMap=null;
+         var markers = [];		//建立空陣列, 作為載入標記點物件的容器使用
+         var infowindow;
+         var TileLayer = null;
+         var kmlLayer = null;
+         var BufferArea = null;
+         var TileType;
+         strs= "";
         function InitWnd() {
             var pOMap = document.getElementById("TGMap");
             var mapOptions = {
@@ -49,55 +56,27 @@
             pMap = new TGOS.TGOnlineMap(pOMap, TGOS.TGCoordSys.EPSG3826); //宣告TGOnlineMap地圖物件並設定坐標系統
             pMap.setCenter(new TGOS.TGPoint(<%=DetailsView1.Rows[17].Cells[1].Text %>, <%=DetailsView1.Rows[18].Cells[1].Text %>));
             pMap.setZoom(11);
-            
+            infowindow = new TGOS.TGInfoWindow();  
+            buffer();
             var infoWindowOptions = { maxWidth: 800, pixelOffset: { x: 0, y:0 }};
             var info = {
                 // 點選 (click) 時, 顯示的欄位, 若未指定則會全部顯示.
             };
             var opts = {
-                queryable: true,//查詢開關
+                queryable: false,//查詢開關
                 visible: true, //圖層開關
                 opacity: 1.0,
                 infoWindowOptions: infoWindowOptions, 
                 // 點選 (click) 時, 顯示的 InfoWindow 設定值
-            };
-            VectorTiledLayer = new TGOS.TGVectorTilePoiLayer("Vector Tile Layer", pMap, info, opts);  //建立地標圖層物件
-        }
-        var TileLayer = null;
-        var kmlLayer = null;
+            };				
 
-        var TileType;
-        function AddTile() {
-            if (TileLayer) {		//如圖面上已經存在主題圖磚圖層，則在切換新的圖磚之前先行移除舊主題圖磚
-                TileLayer.removeTileOverlay(TileType);
-            }
-            var bounds = pMap.getBounds();			//取得目前地圖圖面邊界值
-            TileLayer = new TGOS.TGTileOverlay();	//宣告主題圖磚物件
-            var req = {								//設定主題圖磚需求參數
-                scaleLevel: 0,						//地圖層級
-                left: parseFloat(bounds.left),		//圖磚需求範圍邊界
-                top: parseFloat(bounds.top),
-                right: parseFloat(bounds.right),
-                bottom: parseFloat(bounds.bottom),
-                map: pMap,							//套疊目標地圖
-                overlay: true						//是否套疊主題圖磚
-            };
-
-            if (document.getElementById("TileList").value == 1) {			//取得下拉選單的值
-                TileType = TGOS.TGMapServiceId.CITYZONING;					//依照取得值來指定主題圖磚的種類
-                document.getElementById("legend").innerHTML = "<img src='https://api.tgos.tw/TGOS_API/ThemeLegend/CITYZONING.jpg' title='都市計畫圖'/>";
-            } else if (document.getElementById("TileList").value == 2) {
-                TileType = TGOS.TGMapServiceId.SCHOOL;
-                document.getElementById("legend").innerHTML = "<img src='https://api.tgos.tw/TGOS_API/ThemeLegend/SCHOOL.jpg' title='學校'/>";
-            } else if (document.getElementById("TileList").value == 3) {
-                TileType = TGOS.TGMapServiceId.LANDUSE;
-                document.getElementById("legend").innerHTML = "<img src='https://api.tgos.tw/TGOS_API/ThemeLegend/LANDUSE.png' title='國土利用調查'/>";
-            } else {
-                TileType = TGOS.TGMapServiceId.TOPO1000;
-                document.getElementById("legend").innerHTML = "";
-            }
-            TileLayer.getThemeTile(TileType, req, 0.7, function () { });		//取得主題圖磚進行套疊, 並設定透明度
+          //  VectorTiledLayer = new TGOS.TGVectorTilePoiLayer("Vector Tile Layer", pMap, info, opts);  //建立地標圖層物件
+            
         }
+
+
+        var Query = new TGOS.TGPointBuffer();	//建立TGPointBuffer物件, 準備執行環域查詢使用
+
         function AddKML() {
             if (kmlLayer) {
                 kmlLayer.removeKml();							//假如圖面上已經有KML疊加層, 則先移除掉現有的kml圖層再加入新圖層
@@ -120,75 +99,95 @@
                  kmlLayer.removeKml();
              }
          }
-         </script>
-         <!--
-         <script type="text/javascript">             //查詢學校
-            var markers = new Array();		//建立空陣列, 作為載入標記點物件的容器使用
-            var Query = new TGOS.TGAttriQuery();	//建立屬性查詢物件, 準備執行屬性查詢時使用
-            var strs = "";		//建立一個空字串備用
-            function search() {
-             var txtBox = document.getElementById("result");	//取得網頁上的空白DIV, 作為顯示查詢結果用的區塊
-             txtBox.innerHTML = "";	//每次查詢都先清空DIV的內容
-             strs = "";				//重設空白字串
-	
-             if (markers.length > 0) {		//假設地圖上已存在查詢後得到的標記點, 則先行移除
-                 for (var i = 0; i < markers.length; i++) {
-                     markers[i].setMap(null);
-                 }
-                 markers = [];		
-             }
-             var KH = "高雄市";	//取得使用者輸入的縣市名稱
-             var TN = document.getElementById("TownName").value;	//取得使用者輸入的鄉鎮市區名稱
-             var KW = document.getElementById("Keyword").value;		//取得使用者輸入的關鍵字
-             var queryRequst = {		//設定屬性查詢參數
-                 county: KH,
-                 town: TN,
-                 keyword: KW
-             };
-             Query.identify(TGOS.TGMapServiceId.SCHOOL, TGOS.TGMapId.SCHOOL, queryRequst, TGOS.TGCoordSys.EPSG3826, function(result, status){
-                 //使用方法identify進行屬性查詢, 輸入參數包含欲查詢的服務、欲查詢的圖層、查詢參數、坐標系統及查詢後的函式, result及status分別代表查詢結果及查詢狀態
-                 if (status == TGOS.TGQueryStatus.ZERO_RESULTS) {	//判斷查詢結果是否為查無結果
-                     txtBox.innerHTML = '查無結果';
-                     return;
-                 } else {		//若查詢產生結果, 則執行以下函式
-                     var attris = result.fieldAttr;	//取得圖徵屬性
-                     for (i = 0; i < attris.length; i++) {
-                         //使用迴圈將符合查詢條件的結果全部取出
-                         var str = 'ID: ' + attris[i][1] + '; Name: ' + attris[i][2] + '; Address: ' + attris[i][5] + " " +
-                             '<input type="button" value="定位" onclick="locate(' + attris[i][12] + ',' + attris[i][13] + ');">' + '<br>';
-                         //將結果圖徵的部份屬性取出, 組合成一個html語法的字串, 另外每條結果後方全部都加上一顆按鈕,
-                         //按下後執行function locate(), 並將坐標資訊傳到locate()使用.
-				
-                         strs += str;	//將每次迴圈的字串結果加在一起
-				
-                         var tip = attris[i][1];	//取出查詢結果的各個圖徵名稱, 準備作為標記點的顯示文字
-                         var marker = new TGOS.TGMarker(pMap, new TGOS.TGPoint(attris[i][13], attris[i][14]), tip);	//將查詢結果作成標記點顯示在圖面上
-                         markers.push(marker);	//將所有標記點加入陣列markers
-                     }
-                 }
-                 txtBox.innerHTML = strs;	//將查詢後的文字結果寫入到空白DIV內
-             });
-         }
          function locate(x, y)	{						//定位按鈕執行的函式
              pMap.setZoom(12);							//將地圖縮放至最後一個層級
              pMap.setCenter(new TGOS.TGPoint(x, y));	//取得傳入的坐標, 並將地圖中心移至該坐標位置
          }
-        </script>
-         -->
-         
-         <!--
-        <script type="text/javascript">
-            function initialize() {
-                var mapOptions = {
-                    zoom: 8,
-                    center: new google.maps.LatLng(-34.397, 150.644)
+         </script>
+        
+    <script type="text/javascript">
+        function buffer() {
+            
+            TGOS.TGEvent.addListener(pMap, "click", function(tEvent) {	//建立滑鼠地圖點擊事件監聽器
+                var txtBox = document.getElementById("result");	//取得網頁上的空白DIV, 作為顯示查詢結果用的區塊
+                txtBox.innerHTML = "";	//每次查詢都先清空DIV的內容
+                strs = "";				//重設空白字串
+                if (BufferArea)		//假設地圖上已存在環域圖形(TGFill), 則先行移除
+                    BufferArea.setMap(null);
+                if (markers.length > 0) {	//假設地圖上已存在查詢後得到的標記點, 則先行移除
+                    for (var i = 0; i < markers.length; i++) {
+                        markers[i].setMap(null);
+                    }
+                    markers = [];		
+                }
+                //----------------繪製環域圖形-------------------
+                var radius = parseFloat(document.getElementById("BufferDist").value);	//取得使用者輸入的環域半徑
+                var pt = tEvent.point;	//取得滑鼠點擊位置的坐標點位,為TGPoint物件形式
+                var circle = new TGOS.TGCircle();	//建立一個圓形物件(TGCircle)
+                circle.setCenter(pt);				//以滑鼠點擊位置為圓心
+                circle.setRadius(radius);			//設定半徑
+                var pgnOption = {					//設定圖形樣式
+                    fillColor: "#0099FF",
+                    fillOpacity : 0.1,
+                    strokeWeight : 2,
+                    strokeColor : "#ff00ff"
                 };
+                BufferArea = new TGOS.TGFill(pMap, circle, pgnOption);	//使用TGFill物件將圓形繪製出來
+                pMap.fitBounds(BufferArea.getBounds());
+                pMap.setZoom(pMap.getZoom()-1);			//取得環域圖形的邊界後, 調整地圖顯示的範圍
+		
+                //----------------環域查詢部份-------------------
+                var queryRequst = {		//設定點環域查詢條件, 包含圓心(pt)及半徑(radius)
+                    position: pt,
+                    distance: radius
+                };
+                //var schooltype = document.getElementById().;
+                Query.identify(TGOS.TGMapServiceId.SCHOOL, TGOS.TGMapId.SCHOOL, queryRequst, TGOS.TGCoordSys.EPSG3826, function(result, status){
+                    console.log(result);
+                    //使用方法identify進行點環域查詢, 輸入參數包含欲查詢的服務、欲查詢的圖層、點環域參數、坐標系統及查詢後的函式, result及status分別代表查詢結果及查詢狀態
+                    if (status == TGOS.TGBufferStatus.ZERO_RESULTS) {	//判斷查詢結果是否為查無結果
+                        txtBox.innerHTML = '查無結果';
+                        return;
+                    } else {		//若查詢產生結果, 則執行以下函式
+                        var attris = result.fieldAttr;	//取得圖徵屬性
+                        var pts = result.position;		//取得圖徵點位
+                        console.log(result.fieldAttr.length);
+                        for (var i = 0; i < result.fieldAttr.length; i++) {
+                            var re = result.fieldAttr[i];
+                            var po = result.position[i];
+                            console.log(re);
+                            var marker = new TGOS.TGMarker(pMap, po);
+                            marker.setTitle(re[2]);
+                            marker.annotation = re;
+                            
+                            TGOS.TGEvent.addListener(marker, "mouseover", function (e) {
+                                //設定InfoWindow內容
+                                infowindow.setContent(this.annotation[3]+this.annotation[4]+'<br>'+this.annotation[2]+'<br>'+this.annotation[5]+'<br>'+this.annotation[6]+'<br>'+ this.annotation[8] );
+                                infowindow.setPosition(this.position);
+                                infowindow.open(pMap);
+                                
+                            })
+                            markers.push(marker);	//將所有標記點加入陣列markers
+                        }
+                    }
+                    txtBox.innerHTML = strs;	//將查詢後的文字結果寫入到空白DIV內
+                });
+            });
+        }
 
-                var gmap = new google.maps.Map(document.getElementById('GGMap'),mapOptions);
+        function removebuffer(){
+            if (BufferArea)		//假設地圖上已存在環域圖形(TGFill), 則先行移除
+                BufferArea.setMap(null);
+            if (markers.length > 0) {	//假設地圖上已存在查詢後得到的標記點, 則先行移除
+                for (var i = 0; i < markers.length; i++) {
+                    markers[i].setMap(null);
+                }
+                markers = [];		
             }
-        </script>
-         <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKm4JTJlHZYc4NY57nGsCkVeHnH_v57Cs&callback=initialize"async defer type="text/javascript"></script>
-    -->
+            var txtBox = document.getElementById("result");	//取得網頁上的空白DIV, 作為顯示查詢結果用的區塊
+            txtBox.innerHTML = "";
+        }
+    </script>
     <script type="text/javascript">
         document.body.onload = function () { InitWnd(); }
     </script>
@@ -200,23 +199,11 @@
         
 
          </div>
-    
-    	<div>
-        <select id="TownName">
-		<script>
-		    var myArray = new Array("三民區","大社區","小港區","仁武區","左營區","前鎮區","鳥松區","湖內區","楠梓區","路竹區","鼓山區","旗津區","鳳山區","橋頭區","燕巢區","大寮區","大樹區","林園區","茄萣區","旗山區","彌陀區");
-        for(i=0; i<myArray.length; i++) {  
-            document.write('<option value="' + myArray[i] +'">' + myArray[i] + '</option>');
-        }
-        </script>
-	    </select>		
-		關鍵字: <input type="text" id="Keyword" value="" size=18/>
-		<input type="button" value="學校查詢" onclick="search();"/>
-	    </div>
-        <div id="result" style="width:640px; height:150px; border: 1px solid #C0C0C0; overflow-y:auto"></div>
-
-      
         <div>
+        環域查詢半徑:<input type="text" id="BufferDist" value="1000" size="2"><br>
+	    請點選圖面進行環域查詢<br>
+        <div id="result" style="width:640px; height:150px; border: 1px solid #C0C0C0; overflow-y:auto"></div>
+        <input type="button" value="清除環域" onclick="removebuffer();">
         <select id="urlList">
 		<option value="https://sites.google.com/site/khurbankml/01-高雄市都市計畫主要計畫範圍圖.kml">1.高雄市都市計畫主要計畫範圍圖</option>
 		<option value="https://sites.google.com/site/khurbankml/02-高雄市都市計畫細部計畫範圍圖.kml">2.高雄市都市計畫細部計畫範圍圖</option>
