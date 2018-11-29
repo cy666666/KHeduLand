@@ -85,7 +85,7 @@
             <p>
                 &nbsp;</p>
             <p>
-                <asp:Button ID="btn_insertland" runat="server" OnClick="btn_insertland_Click" Text="確認" />
+                <asp:Button ID="btn_insertland" runat="server" OnClick="btn_insertland_Click" Text="確認"  OnClientClick="if (confirm('確定新增嗎？')==false) {return false;}" UseSubmitBehavior="False"/>
                 <asp:Label ID="lb_insertcheck" runat="server" Text="Label"></asp:Label>
             
             </p>

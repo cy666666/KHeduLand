@@ -49,34 +49,17 @@
             pMap = new TGOS.TGOnlineMap(pOMap, TGOS.TGCoordSys.EPSG3826); //宣告TGOnlineMap地圖物件並設定坐標系統
             pMap.setCenter(new TGOS.TGPoint(<%=DetailsView1.Rows[17].Cells[1].Text %>, <%=DetailsView1.Rows[18].Cells[1].Text %>));
             pMap.setZoom(11);
-
+            
             var infoWindowOptions = { maxWidth: 800, pixelOffset: { x: 0, y:0 }};
             var info = {
-                /*
-                attrFields: [
-                    { name: "ADDRESS", alias: "地址" },
-                    { name: "MARKNAME1", alias: "名稱" }
-                ] // 點選 (click) 時, 顯示的欄位, 若未指定則會全部顯示.
-                */
+                // 點選 (click) 時, 顯示的欄位, 若未指定則會全部顯示.
             };
             var opts = {
                 queryable: true,//查詢開關
                 visible: true, //圖層開關
                 opacity: 1.0,
-                infoWindowOptions: infoWindowOptions, // 點選 (click) 時, 顯示的 InfoWindow 設定值
-                /*pointSymbol: {
-                    field1: "MARKTYPE",
-	                field2: "MARKNAME1",
-                    symbols: {
-                        "99630"  : university,
-                        "99631"  : university,
-                        "99614"  : university,
-                        "99611"  : university,
-                        "99613A" : university,
-                        "99640"  : university,
-                        "99311"  : university
-                    }
-                }*/
+                infoWindowOptions: infoWindowOptions, 
+                // 點選 (click) 時, 顯示的 InfoWindow 設定值
             };
             VectorTiledLayer = new TGOS.TGVectorTilePoiLayer("Vector Tile Layer", pMap, info, opts);  //建立地標圖層物件
         }
@@ -138,7 +121,7 @@
              }
          }
          </script>
-
+         <!--
          <script type="text/javascript">             //查詢學校
             var markers = new Array();		//建立空陣列, 作為載入標記點物件的容器使用
             var Query = new TGOS.TGAttriQuery();	//建立屬性查詢物件, 準備執行屬性查詢時使用
@@ -191,7 +174,9 @@
              pMap.setCenter(new TGOS.TGPoint(x, y));	//取得傳入的坐標, 並將地圖中心移至該坐標位置
          }
         </script>
+         -->
          
+         <!--
         <script type="text/javascript">
             function initialize() {
                 var mapOptions = {
@@ -203,12 +188,13 @@
             }
         </script>
          <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCKm4JTJlHZYc4NY57nGsCkVeHnH_v57Cs&callback=initialize"async defer type="text/javascript"></script>
+    -->
     <script type="text/javascript">
         document.body.onload = function () { InitWnd(); }
     </script>
         <div id="TGMap" style="width: 640px; height: 480px; border: 1px solid #C0C0C0; ">
         </div>
-        <div id="GGMap" style="width:500px; height:500px;"></div>
+       <!-- <div id="GGMap" style="width:500px; height:500px;"></div>-->
 
         <div id="legend">
         
