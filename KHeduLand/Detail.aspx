@@ -43,10 +43,16 @@
          var pMap=null;
          var markers = [];		//建立空陣列, 作為載入標記點物件的容器使用
          var infowindow;
+         var infoWindowOptions
          var TileLayer = null;
          var kmlLayer = null;
          var BufferArea = null;
          var TileType;
+         var time;
+         var SchoolType = ["SCHOOL_A","SCHOOL_B","SCHOOL_D"];
+         var SchoolImgs = ['https://api.tgos.tw/TGOS_API/images/FIREDEPARTMENT.png'
+			,'https://api.tgos.tw/TGOS_API/images/POLICEDEPARTMENT.png'
+			,'https://api.tgos.tw/TGOS_API/images/SHELTERS.png'];	//建立圖示物件
          strs= "";
         function InitWnd() {
             var pOMap = document.getElementById("TGMap");
@@ -56,9 +62,12 @@
             pMap = new TGOS.TGOnlineMap(pOMap, TGOS.TGCoordSys.EPSG3826); //宣告TGOnlineMap地圖物件並設定坐標系統
             pMap.setCenter(new TGOS.TGPoint(<%=DetailsView1.Rows[17].Cells[1].Text %>, <%=DetailsView1.Rows[18].Cells[1].Text %>));
             pMap.setZoom(11);
-            infowindow = new TGOS.TGInfoWindow();  
-            buffer();
-            var infoWindowOptions = { maxWidth: 800, pixelOffset: { x: 0, y:0 }};
+            infoWindowOptions = {maxWidth:800, pixelOffset:new TGOS.TGSize(15, -20), zIndex:99};
+            infowindow = new TGOS.TGInfoWindow();
+            infowindow.setOptions(infoWindowOptions);
+            buffer(SchoolType[0],SchoolImgs[0]); 
+            buffer(SchoolType[1],SchoolImgs[1]);
+            buffer(SchoolType[2],SchoolImgs[2]);
             var info = {
                 // 點選 (click) 時, 顯示的欄位, 若未指定則會全部顯示.
             };
@@ -106,9 +115,9 @@
          </script>
         
     <script type="text/javascript">
-        function buffer() {
+        function buffer(SchoolType,SchoolImgs) {
             
-            TGOS.TGEvent.addListener(pMap, "click", function(tEvent) {	//建立滑鼠地圖點擊事件監聽器
+            TGOS.TGEvent.addListener(pMap, "rightclick", function(tEvent) {	//建立滑鼠地圖點擊事件監聽器
                 var txtBox = document.getElementById("result");	//取得網頁上的空白DIV, 作為顯示查詢結果用的區塊
                 txtBox.innerHTML = "";	//每次查詢都先清空DIV的內容
                 strs = "";				//重設空白字串
@@ -120,6 +129,7 @@
                     }
                     markers = [];		
                 }
+
                 //----------------繪製環域圖形-------------------
                 var radius = parseFloat(document.getElementById("BufferDist").value);	//取得使用者輸入的環域半徑
                 var pt = tEvent.point;	//取得滑鼠點擊位置的坐標點位,為TGPoint物件形式
@@ -142,8 +152,7 @@
                     distance: radius
                 };
                 //var schooltype = document.getElementById().;
-                Query.identify(TGOS.TGMapServiceId.SCHOOL, TGOS.TGMapId.SCHOOL, queryRequst, TGOS.TGCoordSys.EPSG3826, function(result, status){
-                    console.log(result);
+                Query.identify(TGOS.TGMapServiceId.SCHOOL, TGOS.TGMapId[SchoolType], queryRequst, TGOS.TGCoordSys.EPSG3826, function(result, status){
                     //使用方法identify進行點環域查詢, 輸入參數包含欲查詢的服務、欲查詢的圖層、點環域參數、坐標系統及查詢後的函式, result及status分別代表查詢結果及查詢狀態
                     if (status == TGOS.TGBufferStatus.ZERO_RESULTS) {	//判斷查詢結果是否為查無結果
                         txtBox.innerHTML = '查無結果';
@@ -154,18 +163,25 @@
                         console.log(result.fieldAttr.length);
                         for (var i = 0; i < result.fieldAttr.length; i++) {
                             var re = result.fieldAttr[i];
-                            var po = result.position[i];
-                            console.log(re);
-                            var marker = new TGOS.TGMarker(pMap, po);
+                            var po = result.position[i];           
+                            //*********測試**********var imggg= new TGOS.TGImage([SchoolImgs]);
+                            var marker = new TGOS.TGMarker(pMap, po ,imggg);
+                            console.log(marker.getIcon());
                             marker.setTitle(re[2]);
                             marker.annotation = re;
-                            
+
+                            var str = i+1 +'.'+'<a href="'+re[8]+ '" target="_blank">'+re[2] +'</a>'+'<input type="button" value="定位" onclick="locate(' + re[12] + ',' + re[13] + ');">'  + '<br>';
+                            strs += str;
                             TGOS.TGEvent.addListener(marker, "mouseover", function (e) {
                                 //設定InfoWindow內容
-                                infowindow.setContent(this.annotation[3]+this.annotation[4]+'<br>'+this.annotation[2]+'<br>'+this.annotation[5]+'<br>'+this.annotation[6]+'<br>'+ this.annotation[8] );
+                                infowindow.setContent(this.annotation[3]+this.annotation[4]+'<br>'+this.annotation[2]+'<br>'+this.annotation[5]+'<br>'+this.annotation[6]+'<br>');
                                 infowindow.setPosition(this.position);
+                                infowindow.putOpacity(0.8);
                                 infowindow.open(pMap);
-                                
+                            })
+                            TGOS.TGEvent.addListener(marker, "mouseout", function (e) {
+                                //設定InfoWindow內容
+                                infowindow.close();                                
                             })
                             markers.push(marker);	//將所有標記點加入陣列markers
                         }
