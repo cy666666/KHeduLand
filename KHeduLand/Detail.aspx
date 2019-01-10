@@ -43,31 +43,36 @@
          var pMap=null;
          var markers = [];		//建立空陣列, 作為載入標記點物件的容器使用
          var infowindow;
+         var pData=null;
          var infoWindowOptions
          var TileLayer = null;
          var kmlLayer = null;
          var BufferArea = null;
          var TileType;
          var time;
-         var SchoolType = ["SCHOOL_A","SCHOOL_B","SCHOOL_D"];
-         var SchoolImgs = ['https://api.tgos.tw/TGOS_API/images/FIREDEPARTMENT.png'
-			,'https://api.tgos.tw/TGOS_API/images/POLICEDEPARTMENT.png'
-			,'https://api.tgos.tw/TGOS_API/images/SHELTERS.png'];	//建立圖示物件
+         var SchoolType = ["SCHOOL_B","SCHOOL_C","SCHOOL_D","SCHOOL_E","SCHOOL_A"];
+         var SchoolImgs = ["https://sites.google.com/site/khurbankml/appdata/elementary.png"
+			,"https://sites.google.com/site/khurbankml/appdata/elementary.png"
+			,"https://sites.google.com/site/khurbankml/appdata/junior.png"
+            ,"https://sites.google.com/site/khurbankml/appdata/junior.png"
+            ,"https://sites.google.com/site/khurbankml/appdata/kindergarten.png"];	//建立圖示物件
          strs= "";
-        function InitWnd() {
+         function InitWnd() {
+             
             var pOMap = document.getElementById("TGMap");
             var mapOptions = {
                 mapTypeControl: false	//mapTypeControl(關閉地圖類型控制項)
             };
+
             pMap = new TGOS.TGOnlineMap(pOMap, TGOS.TGCoordSys.EPSG3826); //宣告TGOnlineMap地圖物件並設定坐標系統
             pMap.setCenter(new TGOS.TGPoint(<%=DetailsView1.Rows[17].Cells[1].Text %>, <%=DetailsView1.Rows[18].Cells[1].Text %>));
             pMap.setZoom(11);
-            infoWindowOptions = {maxWidth:800, pixelOffset:new TGOS.TGSize(15, -20), zIndex:99};
+            infoWindowOptions = {maxWidth:800, pixelOffset:new TGOS.TGSize(20, -25), zIndex:99};
             infowindow = new TGOS.TGInfoWindow();
             infowindow.setOptions(infoWindowOptions);
-            buffer(SchoolType[0],SchoolImgs[0]); 
-            buffer(SchoolType[1],SchoolImgs[1]);
-            buffer(SchoolType[2],SchoolImgs[2]);
+            for(n=0;n<SchoolType.length;n++){
+                buffer(SchoolType[n],SchoolImgs[n]);
+            }
             var info = {
                 // 點選 (click) 時, 顯示的欄位, 若未指定則會全部顯示.
             };
@@ -78,25 +83,84 @@
                 infoWindowOptions: infoWindowOptions, 
                 // 點選 (click) 時, 顯示的 InfoWindow 設定值
             };				
-
+           /* kmlLayer1 = new TGOS.TGKmlLayer("https://sites.google.com/site/khurbankml/學校保留地3826.kml", {				//設定KML圖層
+                map: pMap,									//設定欲疊加的底圖
+                zIndex:30,
+                suppressInfoWindows: false,				//可點選KML圖徵顯示訊息視窗, 若設為true則無法顯示訊息視窗
+                preserveViewport: false						//疊加KML後將圖面縮放至KML的範圍, 若設為false則取消這個功能
+            });
+            kmlLayer2 = new TGOS.TGKmlLayer("https://sites.google.com/site/khurbankml/01-高雄市都市計畫主要計畫範圍圖.kml", {				//設定KML圖層
+                map: pMap,									//設定欲疊加的底圖
+                zIndex:20,
+                suppressInfoWindows: false,				//可點選KML圖徵顯示訊息視窗, 若設為true則無法顯示訊息視窗
+                preserveViewport: false						//疊加KML後將圖面縮放至KML的範圍, 若設為false則取消這個功能
+            });*/
           //  VectorTiledLayer = new TGOS.TGVectorTilePoiLayer("Vector Tile Layer", pMap, info, opts);  //建立地標圖層物件
-            
         }
 
-
+        function send()
+        {
+            if(pData != null)
+            {
+                pData.clearAll();
+            }
+            var url = "/Scripts/KHDistrict.geojson";
+            pData = new TGOS.TGData({map: pMap});
+            console.log(pData);
+            pData.loadGeoJson(url,{idPropertyName:"GEOJSON"},function(graphic)//指定資料來源
+            {  
+                var style1 =  {
+                    fillColor:"DD0000",
+                    fillOpacity:0,
+                    strokeColor: "#DD0000",
+                    strokeWeight: 3,
+                }
+                var style2 =  {
+                    strokeColor: "#FFAA00",
+                    strokeWeight: 6
+                }
+                for(var i = 0; i < graphic.length; i++)
+                {
+                    if(graphic[i].properties.COUNTYID == "E" )
+                    {
+                        pData.overrideStyle(graphic[i], style1);
+                    }
+                    else 
+                    {
+                        pData.overrideStyle(graphic[i], style2);
+                    }
+                }
+                pData.setMap(pMap);  //設定呈現幾何圖層物件的地圖物件
+            });
+        }
+        function DistrictReset()
+        {
+            if(pData != null)
+            {
+                pData.clearAll();
+            }
+        }
+        function ClearAll(lbs){
+            if (lbs.length > 0) {				
+                for (var i = 0; i < lbs.length; i++) {
+                    lbs[i].setMap(null);	//清除所有
+                }
+            }
+        }
         var Query = new TGOS.TGPointBuffer();	//建立TGPointBuffer物件, 準備執行環域查詢使用
-
         function AddKML() {
             if (kmlLayer) {
-                kmlLayer.removeKml();							//假如圖面上已經有KML疊加層, 則先移除掉現有的kml圖層再加入新圖層
+               // kmlLayer.removeKml();							//假如圖面上已經有KML疊加層, 則先移除掉現有的kml圖層再加入新圖層
             }
             var list = document.getElementById("urlList");
             var url = list.options[list.selectedIndex].value;	//取得下拉選單的KML網址
             kmlLayer = new TGOS.TGKmlLayer(url, {				//設定KML圖層
                 map: pMap,									//設定欲疊加的底圖
+                zIndex:30,
                 suppressInfoWindows: false,				//可點選KML圖徵顯示訊息視窗, 若設為true則無法顯示訊息視窗
-                preserveViewport: false						//疊加KML後將圖面縮放至KML的範圍, 若設為false則取消這個功能
+                preserveViewport: true						//疊加KML後將圖面縮放至KML的範圍, 若設為false則取消這個功能
             });
+
         }
         function setCenter() {
             var CenterX = Number(document.getElementById("<%=DetailsView1.Rows[17].Cells[1].Text %>").value);
@@ -104,15 +168,14 @@
             pMap.setCenter(new TGOS.TGPoint(CenterX, CenterY)); //移至此地圖坐標
         }
          function removeKML(){
-             if(kmlLayer){
-                 kmlLayer.removeKml();
-             }
+             kmlLayer1.removeKml();
+             kmlLayer2.removeKml();
          }
          function locate(x, y)	{						//定位按鈕執行的函式
              pMap.setZoom(12);							//將地圖縮放至最後一個層級
              pMap.setCenter(new TGOS.TGPoint(x, y));	//取得傳入的坐標, 並將地圖中心移至該坐標位置
          }
-         </script>
+     </script>
         
     <script type="text/javascript">
         function buffer(SchoolType,SchoolImgs) {
@@ -140,7 +203,8 @@
                     fillColor: "#0099FF",
                     fillOpacity : 0.1,
                     strokeWeight : 2,
-                    strokeColor : "#ff00ff"
+                    strokeColor : "#ff00ff",
+                    zIndex:50
                 };
                 BufferArea = new TGOS.TGFill(pMap, circle, pgnOption);	//使用TGFill物件將圓形繪製出來
                 pMap.fitBounds(BufferArea.getBounds());
@@ -161,12 +225,13 @@
                         var attris = result.fieldAttr;	//取得圖徵屬性
                         var pts = result.position;		//取得圖徵點位
                         console.log(result.fieldAttr.length);
+                        console.log(SchoolType);
                         for (var i = 0; i < result.fieldAttr.length; i++) {
                             var re = result.fieldAttr[i];
                             var po = result.position[i];           
-                            //*********測試**********var imggg= new TGOS.TGImage([SchoolImgs]);
-                            var marker = new TGOS.TGMarker(pMap, po ,imggg);
-                            console.log(marker.getIcon());
+                            console.log([SchoolImgs]);
+                            markerImg = new TGOS.TGImage([SchoolImgs][0], new TGOS.TGSize(25, 25), new TGOS.TGPoint(0, 0), new TGOS.TGPoint(10, 33))
+                            var marker = new TGOS.TGMarker(pMap,po,re[2],markerImg);
                             marker.setTitle(re[2]);
                             marker.annotation = re;
 
@@ -190,7 +255,10 @@
                 });
             });
         }
-
+        function getZindex(){
+            alert(kmlLayer.getZIndex);
+            console.log(kmlLayer);
+        }
         function removebuffer(){
             if (BufferArea)		//假設地圖上已存在環域圖形(TGFill), 則先行移除
                 BufferArea.setMap(null);
@@ -207,6 +275,21 @@
     <script type="text/javascript">
         document.body.onload = function () { InitWnd(); }
     </script>
+    <div id="mapid" style="width: 100%;"></div>
+    <script type="text/javascript">
+        var myMap = L.map('mapid', {
+            center: [22.73444963475145, 120.28458595275877],
+            zoom: 14
+        });
+        (function($){
+            $(document).ready(function(){
+                $('#mapid').height(window.innerHeight);
+            });
+        })($)
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 14
+        }).addTo(myMap);
+    </script>
         <div id="TGMap" style="width: 640px; height: 480px; border: 1px solid #C0C0C0; ">
         </div>
        <!-- <div id="GGMap" style="width:500px; height:500px;"></div>-->
@@ -216,18 +299,25 @@
 
          </div>
         <div>
-        環域查詢半徑:<input type="text" id="BufferDist" value="1000" size="2"><br>
-	    請點選圖面進行環域查詢<br>
-        <div id="result" style="width:640px; height:150px; border: 1px solid #C0C0C0; overflow-y:auto"></div>
+        環域查詢半徑:<input type="text" id="BufferDist" value="1000" size="2">公尺<br>
+	    請點選圖面進行環域查詢
         <input type="button" value="清除環域" onclick="removebuffer();">
+            <br>
+        <div id="result" style="width:640px; height:150px; border: 1px solid #C0C0C0; overflow-y:auto"></div>
+        
         <select id="urlList">
-		<option value="https://sites.google.com/site/khurbankml/01-高雄市都市計畫主要計畫範圍圖.kml">1.高雄市都市計畫主要計畫範圍圖</option>
-		<option value="https://sites.google.com/site/khurbankml/02-高雄市都市計畫細部計畫範圍圖.kml">2.高雄市都市計畫細部計畫範圍圖</option>
+		    <option value="https://sites.google.com/site/khurbankml/01-高雄市都市計畫主要計畫範圍圖.kml">1.高雄市都市計畫主要計畫範圍圖</option>
+		    <option value="https://sites.google.com/site/khurbankml/02-高雄市都市計畫細部計畫範圍圖.kml">2.高雄市都市計畫細部計畫範圍圖</option>
+            <option value="https://sites.google.com/site/khurbankml/學校保留地3826.kml">3.學校保留地</option>
+            <option value="https://sites.google.com/site/khurbankml/學校保留地test.kml">test</option>
 	    </select>  
+
         <input type="button" value="加入圖層" onclick="AddKML();">
         <input type="button" value="清空圖層" onclick="removeKML();">
          </div>
-
+         <input type="button" value="顯示行政區界線" onclick="send();">
+         <input type="button" value="隱藏行政區界線" onclick="DistrictReset();">
+         <input type="button" value="顯示堆疊順序" onclick="getZindex();">
          <div>
          X<input type="text" id="CenterX" value="<%=DetailsView1.Rows[17].Cells[1].Text %>" size="7" />
          Y<input type="text" id="CenterY" value="<%=DetailsView1.Rows[18].Cells[1].Text %>" size="7" />
@@ -236,5 +326,11 @@
          <br />
     </div>
 
+    
+
+    <script type="text/javascript">
+     
+   
+    </script>
 </asp:Content>
 

@@ -15,7 +15,9 @@
     <webopt:bundlereference runat="server" path="~/Content/css" />
     <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
     <script type="text/javascript" src="http://api.tgos.tw/TGOS_API/tgos?ver=2&AppID=kOKB4i674QFcKJAYNCljlHTlIUh8VxKCJYeWkYoIVXEOx7xkkUeHxQ==&APIKey=cGEErDNy5yN/1fQ0vyTOZrghjE+jIU6uwTAxJL75pM6HqosSNT+bowHs5QYyV0BiYi2YRUg7GbZbaQZYBZPCrUv4iCn5ybWs99q9up2ncOvicfPTNXrQJxxKJFr9LdxhqxNxAEAGul3Pnn+0pzOKH+oBG+eifCOGQTHyH9hq+N6Ml6+AwZc3ejL56Zksj9uUVZzcxmWpSOlNw46Bf4SBsY0Z+CVTwVbDa13ZvXG6/Xk8XNz3XLZDPmz2A8met15QelpQwkK+OWAx2H8IJjXbIhAyYYyXWdvXXt1Od0VEOAO6krKwkwLxlE+H05plChxmHadisPii+Bysw0Jkpdd7bTvCHkjHyuws" charset="utf-8"></script>
-    
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"/>
+    <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"></script>
+
 </head>
 <body>
     <form runat="server">
